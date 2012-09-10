@@ -1,4 +1,4 @@
-require "rexml/document"
+  require "rexml/document"
 require "rexml/xpath"
 require "net/https"
 require "uri"
@@ -32,28 +32,47 @@ module Onelogin::Saml
 				@settings = settings
 			end
 		end
+    
 		def generate
 			meta_doc = REXML::Document.new
 			root = meta_doc.add_element "md:EntityDescriptor", { 
 					"xmlns:md" => "urn:oasis:names:tc:SAML:2.0:metadata" 
 			}
 			sp_sso = root.add_element "md:SPSSODescriptor", { 
-					"protocolSupportEnumeration" => "urn:oasis:names:tc:SAML:2.0:protocol"
+					"protocolSupportEnumeration" => "urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol"
 			}
+      
+      key_descriptor_signing = sp_sso.add_element "md:KeyDescriptor", {
+        "use" => "signing"
+      }
+      
+      add_certificate key_descriptor_signing
+      
+      key_descriptor_encryption = sp_sso.add_element "md:KeyDescriptor", {
+        "use" => "encryption"
+      }
+      
+      add_certificate key_descriptor_encryption
+      
+      # Add the contacts
+      if @settings.contacts != nil || @settings.contact.size
+        @settings.contacts.each do |type,contact_details|
+    			contact = root.add_element "md:ContactPerson", { 
+    					"contactType" => type 
+    			}
+          
+          contact_details.each do |detail_key,detail_value|
+            detail = contact.add_element "md:#{detail_key.to_s.camelize}"
+            detail.text = detail_value
+          end
+        end
+  			
+      end
+      
 			if @settings.issuer != nil
 				root.attributes["entityID"] = @settings.issuer
 			end
-			if @settings.name_identifier_format != nil
-				name_id = sp_sso.add_element "md:NameIDFormat"
-				name_id.text = @settings.name_identifier_format
-			end
-			if @settings.assertion_consumer_service_url != nil
-				sp_sso.add_element "md:AssertionConsumerService", {
-						# Add this as a setting to create different bindings?
-						"Binding" => @settings.assertion_consumer_service_binding,
-						"Location" => @settings.assertion_consumer_service_url
-				}
-			end
+			
 			if @settings.single_logout_service_url != nil
 				sp_sso.add_element "md:SingleLogoutService", {
 						# Add this as a setting to create different bindings?
@@ -61,6 +80,50 @@ module Onelogin::Saml
 						"Location" => @settings.single_logout_service_url
 				}
 			end
+      
+			if @settings.assertion_consumer_service_url != nil
+				sp_sso.add_element "md:AssertionConsumerService", {
+						# Add this as a setting to create different bindings?
+						"Binding" => @settings.assertion_consumer_service_binding,
+						"Location" => @settings.assertion_consumer_service_url,
+            "index" => 0
+				}
+				sp_sso.add_element "md:AssertionConsumerService", {
+						# Add this as a setting to create different bindings?
+						"Binding" => "urn:oasis:names:tc:SAML:1.0:profiles:browser-post",
+						"Location" => @settings.assertion_consumer_service_url,
+            "index" => 1
+				}
+				sp_sso.add_element "md:AssertionConsumerService", {
+						# Add this as a setting to create different bindings?
+						"Binding" => "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact",
+						"Location" => @settings.assertion_consumer_service_url,
+            "index" => 2
+				}
+				sp_sso.add_element "md:AssertionConsumerService", {
+						# Add this as a setting to create different bindings?
+						"Binding" => "urn:oasis:names:tc:SAML:1.0:profiles:artifact-01",
+						"Location" => @settings.assertion_consumer_service_url,
+            "index" => 3
+				}
+			end			
+      
+			if @settings.name_identifier_format != nil
+				name_id = sp_sso.add_element "md:NameIDFormat"
+				name_id.text = @settings.name_identifier_format
+			end
+      
+      
+      # if @settings.contact_givenname != nil      
+      #         contact_givenname = contact.add_element "md:GivenName"
+      #         contact_givenname.text = @settings.contact_givenname
+      #       end
+      #       
+      #       if @settings.contact_email != nil    
+      #         contact_email = contact.add_element "md:EmailAddress"
+      #         contact_email.text = @settings.contact_email
+      #       end
+      
 			meta_doc << REXML::XMLDecl.new
 			ret = ""
 			# pretty print the XML so IdP administrators can easily see what the SP supports
@@ -70,7 +133,8 @@ module Onelogin::Saml
 			
 			return ret
 			
-		end
+		end	
+
 		# Retrieve the remote IdP metadata from the URL or a cached copy 
 		# returns a REXML document of the metadata
 		def get_idp_metadata
@@ -122,6 +186,14 @@ module Onelogin::Saml
 						"/KeyDescriptor[@use='signing']" +
 						"/ds:KeyInfo/ds:X509Data/ds:X509Certificate"
 					)
+					
+			if x509.nil?		
+  			x509  = REXML::XPath.first(meta_doc, 
+  							"/md:EntityDescriptor/md:IDPSSODescriptor" +
+  						"/md:KeyDescriptor[@use='signing']" +
+  						"/ds:KeyInfo/ds:X509Data/ds:X509Certificate"
+  					)	
+    	end	
 			# If the IdP didn't specify the use attribute
 			if x509.nil?
 				x509 = REXML::XPath.first(meta_doc, 
@@ -131,7 +203,18 @@ module Onelogin::Saml
 					)
 			end
 			@settings.idp_cert = x509.text.gsub(/\n/, "")
-		end
+		end	
+
+    
+    def add_certificate(parent)
+      
+      key_info = parent.add_element "ds:KeyInfo", {
+        "xmlns:ds" =>"http://www.w3.org/2000/09/xmldsig#"
+      }
+      x509_data = key_info.add_element "ds:X509Data"
+      x509_certificate = x509_data.add_element "ds:X509Certificate"
+      x509_certificate.text = @settings.idp_cert
+    end    
 		
 		def create_sso_request(message, extra_parameters = {} )
 			build_message( :type => "SAMLRequest", 

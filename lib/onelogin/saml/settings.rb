@@ -2,14 +2,15 @@ module Onelogin::Saml
   class Settings
     attr_accessor :assertion_consumer_service_url, :issuer, :sp_name_qualifier
     attr_accessor :idp_sso_target_url, :idp_cert_fingerprint, :idp_cert, :name_identifier_format
-	 attr_accessor :authn_context, :idp_metadata, :idp_metadata_ttl
-	 attr_accessor :assertion_consumer_service_binding, :idp_slo_target_url
-	 attr_accessor :single_logout_service_url, :single_logout_service_binding
-	 alias :entity_id :issuer
-	 alias :acs_url :assertion_consumer_service_url
-	 alias :acs_binding :assertion_consumer_service_binding
-	 alias :slo_url :single_logout_service_url
-	 alias :slo_binding :single_logout_service_binding
+    attr_accessor :authn_context, :idp_metadata, :idp_metadata_ttl
+    attr_accessor :assertion_consumer_service_binding, :idp_slo_target_url
+    attr_accessor :single_logout_service_url, :single_logout_service_binding
+    attr_accessor :contacts
+    alias :entity_id :issuer
+    alias :acs_url :assertion_consumer_service_url
+    alias :acs_binding :assertion_consumer_service_binding
+    alias :slo_url :single_logout_service_url
+    alias :slo_binding :single_logout_service_binding
 	 
 		def initialize 
 			# Set some sane default values on a few options
