@@ -29,7 +29,7 @@ class RequestTest < Test::Unit::TestCase
       assert auth_url =~ /&hello=there$/
 
       action, auth_url = Onelogin::Saml::Authrequest.new(settings).create({ :hello => nil })
-      assert auth_url =~ /&hello=$/
+      assert auth_url =~ /&hello$/
     end
 	 
 	 should "Generate HTTP-Redirect request" do

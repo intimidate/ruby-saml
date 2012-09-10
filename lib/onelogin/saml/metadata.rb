@@ -42,20 +42,19 @@ module Onelogin::Saml
 					"protocolSupportEnumeration" => "urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol"
 			}
       
-      key_descriptor_signing = sp_sso.add_element "md:KeyDescriptor", {
-        "use" => "signing"
-      }
-      
-      add_certificate key_descriptor_signing
-      
-      key_descriptor_encryption = sp_sso.add_element "md:KeyDescriptor", {
-        "use" => "encryption"
-      }
-      
-      add_certificate key_descriptor_encryption
+      if @settings.idp_cert      
+        key_descriptor_signing = sp_sso.add_element "md:KeyDescriptor", {
+          "use" => "signing"
+        }      
+        add_certificate key_descriptor_signing      
+        key_descriptor_encryption = sp_sso.add_element "md:KeyDescriptor", {
+          "use" => "encryption"
+        }      
+        add_certificate key_descriptor_encryption
+      end
       
       # Add the contacts
-      if @settings.contacts != nil || @settings.contact.size
+      if @settings.contacts != nil && @settings.contacts.size
         @settings.contacts.each do |type,contact_details|
     			contact = root.add_element "md:ContactPerson", { 
     					"contactType" => type 

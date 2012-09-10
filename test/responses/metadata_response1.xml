@@ -1,9 +1,12 @@
 <?xml version='1.0'?>
 <md:EntityDescriptor xmlns:md='urn:oasis:names:tc:SAML:2.0:metadata' entityID='http://sp.example.com'>
- <md:SPSSODescriptor protocolSupportEnumeration='urn:oasis:names:tc:SAML:2.0:protocol'>
+ <md:SPSSODescriptor protocolSupportEnumeration='urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol'>
+  <md:AssertionConsumerService Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' Location='http://sp.example.com/saml/consume' index='0'/>
+  <md:AssertionConsumerService Binding='urn:oasis:names:tc:SAML:1.0:profiles:browser-post' Location='http://sp.example.com/saml/consume' index='1'/>
+  <md:AssertionConsumerService Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact' Location='http://sp.example.com/saml/consume' index='2'/>
+  <md:AssertionConsumerService Binding='urn:oasis:names:tc:SAML:1.0:profiles:artifact-01' Location='http://sp.example.com/saml/consume' index='3'/>
   <md:NameIDFormat>
    urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
   </md:NameIDFormat>
-  <md:AssertionConsumerService Location='http://sp.example.com/saml/consume' Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'/>
  </md:SPSSODescriptor>
 </md:EntityDescriptor>
