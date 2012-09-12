@@ -19,7 +19,7 @@ module Onelogin::Saml
 		HTTP_GET = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
 		
 		attr_accessor :cache
-		
+
 		def initialize( settings )
 			# If we're running in Rails, use the RailsCache
 			if defined? Rails
@@ -212,7 +212,7 @@ module Onelogin::Saml
       }
       x509_data = key_info.add_element "ds:X509Data"
       x509_certificate = x509_data.add_element "ds:X509Certificate"
-      x509_certificate.text = @settings.idp_cert
+      x509_certificate.text = @settings.get_cert
     end    
 		
 		def create_sso_request(message, extra_parameters = {} )
@@ -259,6 +259,9 @@ module Onelogin::Saml
 		def binding_select(service)
 			# first check if we're still using the old hard coded method for 
 			# backwards compatability
+      
+      metadata_namespace = "#{@settings.metadata_namespace}:" if @settings.metadata_namespace
+
 			if service == "SingleSignOnService" && 
 				@settings.idp_metadata == nil && @settings.idp_sso_target_url != nil
 					return "GET", @settings.idp_sso_target_url
@@ -271,24 +274,23 @@ module Onelogin::Saml
 			meta_doc = get_idp_metadata
 			
 			return nil unless meta_doc
-			
-			# first try POST
+   
 			sso_element = REXML::XPath.first(meta_doc,
-				"/EntityDescriptor/IDPSSODescriptor/#{service}[@Binding='#{HTTP_POST}']")
+				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}IDPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_POST}']")
 			if sso_element 
 				@URL = sso_element.attributes["Location"]
 				Logging.debug "binding_select: POST to #{@URL}"
 				return "POST", @URL
 			end
-			
+      
 			# next try GET
 			sso_element = REXML::XPath.first(meta_doc,
-				"/EntityDescriptor/IDPSSODescriptor/#{service}[@Binding='#{HTTP_GET}']")
+				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}IDPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_GET}']")
 			if sso_element 
 				@URL = sso_element.attributes["Location"]
 				Logging.debug "binding_select: GET from #{@URL}"
 				return "GET", @URL
-			end
+			end      
 			# other types we might want to add in the future:  SOAP, Artifact
 		end
 		# construct the the parameter list on the URL and return

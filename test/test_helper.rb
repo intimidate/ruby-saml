@@ -66,5 +66,22 @@ class Test::Unit::TestCase
   def logout_response1
     @logout_response1 ||= File.read(File.join(File.dirname(__FILE__), 'responses', 'logout_response1.base64')).chomp
   end
+  
+  # compare to xml strings, thanks to http://drawohara.com/post/89110816/ruby-comparing-xml
+  def xml_compare a, b
+    a = REXML::Document.new(a.to_s)
+    b = REXML::Document.new(b.to_s)
+
+    normalized = Class.new(REXML::Formatters::Pretty) do
+      def write_text(node, output)
+        super(node.to_s.strip, output)
+      end
+    end
+
+    normalized.new(indentation=0,ie_hack=false).write(node=a, a_normalized='')
+    normalized.new(indentation=0,ie_hack=false).write(node=b, b_normalized='')
+
+    a_normalized == b_normalized
+  end
 
 end

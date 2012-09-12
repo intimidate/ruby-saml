@@ -38,6 +38,38 @@ module Onelogin::Saml
 				issuer = root.add_element "saml:Issuer", { "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion" }
 				issuer.text = @settings.issuer
 			end
+      
+      
+      if @settings.authn_signed
+        digest = Base64.encode64(Digest::SHA1.digest(uuid)).chomp
+                
+				signature = root.add_element "ds:Signature", { "xmlns:ds" => "http://www.w3.org/2000/09/xmldsig#" }
+        signature.add_element "ds:CanonicalizationMethod", { "Algorithm" => "http://www.w3.org/2001/10/xml-exc-c14n#" }
+        signature.add_element "ds:SignatureMethod", { "Algorithm" => "http://www.w3.org/2000/09/xmldsig#rsa-sha1" }
+        reference = signature.add_element "Reference", { "URI" => "#{uuid}" }
+        transforms = reference.add_element "Transforms"
+        transforms.add_element "Transform", {"Algorithm" => "http://www.w3.org/2000/09/xmldsig#enveloped-signature"}
+        transforms.add_element "Transform", {"Algorithm" => "http://www.w3.org/2001/10/xml-exc-c14n#"}
+        
+        reference.add_element "DigestMethod", {"Algorithm" => "http://www.w3.org/2000/09/xmldsig#rsa-sha1"}
+        digest_value = reference.add_element "DigestValue"
+        digest_value.text = digest
+        
+        
+        private_key = @settings.get_private_key
+        sig = private_key.sign(OpenSSL::Digest::SHA1.new, digest)
+        sig = [sig].pack("m").gsub(/\n/, "")
+        
+        
+        signed_info = signature.add_element "ds:SignedInfo"
+        signature_value = signature.add_element "ds:SignatureValue"
+        signature_value.text = sig
+        key_info = signature.add_element "ds:keyInfo"
+        x509_data = key_info.add_element "ds:X509Data"
+        x509_certificate = x509_data.add_element "ds:X509Certificate"
+        x509_certificate.text = @settings.get_cert
+      end
+      
 			if @settings.name_identifier_format != nil
 				root.add_element "samlp:NameIDPolicy", { 
 						"xmlns:samlp" => "urn:oasis:names:tc:SAML:2.0:protocol",
@@ -77,40 +109,6 @@ module Onelogin::Saml
 			# and return the action to perform to the controller
 			meta = Metadata.new( @settings )
 			return meta.create_sso_request( @request, params )
-		end
-	
-		# get the IdP metadata, and select the appropriate SSO binding
-		# that we can support.  Currently this is HTTP-Redirect and HTTP-POST
-		# but more could be added in the future
-		def binding_select
-			# first check if we're still using the old hard coded method for 
-			# backwards compatability
-			if @settings.idp_metadata == nil && @settings.idp_sso_target_url != nil
-				@URL = @settings.idp_sso_target_url
-				return "GET", content_get
-			end
-			# grab the metadata
-			metadata = Metadata::new
-			meta_doc = metadata.get_idp_metadata(@settings)
-			
-			# first try POST
-			sso_element = REXML::XPath.first(meta_doc,
-				"/EntityDescriptor/IDPSSODescriptor/SingleSignOnService[@Binding='#{HTTP_POST}']")
-			if sso_element 
-				@URL = sso_element.attributes["Location"]
-				Logging.debug "binding_select: POST to #{@URL}"
-				return "POST", content_post
-			end
-			
-			# next try GET
-			sso_element = REXML::XPath.first(meta_doc,
-				"/EntityDescriptor/IDPSSODescriptor/SingleSignOnService[@Binding='#{HTTP_GET}']")
-			if sso_element 
-				@URL = sso_element.attributes["Location"]
-				Logging.debug "binding_select: GET from #{@URL}"
-				return "GET", content_get
-			end
-			# other types we might want to add in the future:  SOAP, Artifact
 		end
 		
 		# construct the the parameter list on the URL and return

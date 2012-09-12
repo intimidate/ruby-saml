@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="aselect-s.entree.kennisnet.nl" entityID="aselect-s.entree.kennisnet.nl"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference URI="#aselect-s.entree.kennisnet.nl">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"><ec:InclusiveNamespaces xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" PrefixList="ds md"/></ds:Transform>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>G6viQO9pWD45HLjGmEk87nLH7NY=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+kHzPIBiM8TyS2Ku+TvPsEQy3lu+gSLqY8cjwU2QrRRjQDezMHQKKwD8YfD5gNhQ4u9wpFfXjX50B
+fTgJIuEwMZn06XiNtG9cTbQNs3fzLqczGikL3vp/IBFj4y5kYXzCyy9NuRoc1EPGd2NDjFk5JR45
+Dv37VSbsgp3Slb8OepM=
+</ds:SignatureValue>
+<ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIICwDCCAikCBE1k+lAwDQYJKoZIhvcNAQEEBQAwgaYxCzAJBgNVBAYTAk5MMRUwEwYDVQQIEwxa
+dWlkLUhvbGxhbmQxEzARBgNVBAcTClpvZXRlcm1lZXIxHDAaBgNVBAoTE1N0aWNodGluZyBLZW5u
+aXNuZXQxHzAdBgNVBAsTFkVudHJlZSBOZXh0IEdlbmVyYXRpb24xLDAqBgNVBAMTI2FzZWxlY3Qu
+c3RhZ2luZy5lbnRyZWUua2VubmlzbmV0Lm5sMB4XDTExMDIyMzEyMTUxMloXDTE2MDIwNjEyMTUx
+MlowgaYxCzAJBgNVBAYTAk5MMRUwEwYDVQQIEwxadWlkLUhvbGxhbmQxEzARBgNVBAcTClpvZXRl
+cm1lZXIxHDAaBgNVBAoTE1N0aWNodGluZyBLZW5uaXNuZXQxHzAdBgNVBAsTFkVudHJlZSBOZXh0
+IEdlbmVyYXRpb24xLDAqBgNVBAMTI2FzZWxlY3Quc3RhZ2luZy5lbnRyZWUua2VubmlzbmV0Lm5s
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+iQDEWzzn76RgfOsnNrE0xS+WvmXr6oWTwoMa
+NVGZC5UnESbV5vPsNWTEbP8Vh2bT6kTaTnjDMx4POWasHnBPR/h0MCJ78D4nqkIEuhz+QBEvfMgZ
+EgXJgOtoqgenDpXAkoetJkkkmRwt4mBk+puUJUaP3WcI5/J7BM/NdH6JQwIDAQABMA0GCSqGSIb3
+DQEBBAUAA4GBAK5WdDPy4clXgsVWie58A0NkALRwCl7Rbwb0bzddNN0qMpbHGZVINQWzbv6fitd5
+LLAP8wKtEA82unqH7GpQ+8P1BNlmQVbVBA/otFP1n4NKxKBWwyBgNo6CzsCw/yDSxShNH4abwXs0
+OhQcnAYnY6WNzYAbG/OVcIuYbkxfiiCk</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature><md:SPSSODescriptor AuthnRequestsSigned="true" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"><md:KeyDescriptor use="signing"><ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:X509Data><ds:X509Certificate>MIICwDCCAikCBE1k+lAwDQYJKoZIhvcNAQEEBQAwgaYxCzAJBgNVBAYTAk5MMRUwEwYDVQQIEwxa
+dWlkLUhvbGxhbmQxEzARBgNVBAcTClpvZXRlcm1lZXIxHDAaBgNVBAoTE1N0aWNodGluZyBLZW5u
+aXNuZXQxHzAdBgNVBAsTFkVudHJlZSBOZXh0IEdlbmVyYXRpb24xLDAqBgNVBAMTI2FzZWxlY3Qu
+c3RhZ2luZy5lbnRyZWUua2VubmlzbmV0Lm5sMB4XDTExMDIyMzEyMTUxMloXDTE2MDIwNjEyMTUx
+MlowgaYxCzAJBgNVBAYTAk5MMRUwEwYDVQQIEwxadWlkLUhvbGxhbmQxEzARBgNVBAcTClpvZXRl
+cm1lZXIxHDAaBgNVBAoTE1N0aWNodGluZyBLZW5uaXNuZXQxHzAdBgNVBAsTFkVudHJlZSBOZXh0
+IEdlbmVyYXRpb24xLDAqBgNVBAMTI2FzZWxlY3Quc3RhZ2luZy5lbnRyZWUua2VubmlzbmV0Lm5s
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+iQDEWzzn76RgfOsnNrE0xS+WvmXr6oWTwoMa
+NVGZC5UnESbV5vPsNWTEbP8Vh2bT6kTaTnjDMx4POWasHnBPR/h0MCJ78D4nqkIEuhz+QBEvfMgZ
+EgXJgOtoqgenDpXAkoetJkkkmRwt4mBk+puUJUaP3WcI5/J7BM/NdH6JQwIDAQABMA0GCSqGSIb3
+DQEBBAUAA4GBAK5WdDPy4clXgsVWie58A0NkALRwCl7Rbwb0bzddNN0qMpbHGZVINQWzbv6fitd5
+LLAP8wKtEA82unqH7GpQ+8P1BNlmQVbVBA/otFP1n4NKxKBWwyBgNo6CzsCw/yDSxShNH4abwXs0
+OhQcnAYnY6WNzYAbG/OVcIuYbkxfiiCk</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/artifact" index="0"/><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/sp/sso/logout"/><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/sp/sso/logout"/><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/sp/sso/logout"/><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/sp/sso/logout"/><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/sp/sso/web" index="0" isDefault="true"/><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/sp/sso/web" index="1" isDefault="false"/></md:SPSSODescriptor><md:IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"><md:KeyDescriptor use="signing"><ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:X509Data><ds:X509Certificate>MIICwDCCAikCBE1k+lAwDQYJKoZIhvcNAQEEBQAwgaYxCzAJBgNVBAYTAk5MMRUwEwYDVQQIEwxa
+dWlkLUhvbGxhbmQxEzARBgNVBAcTClpvZXRlcm1lZXIxHDAaBgNVBAoTE1N0aWNodGluZyBLZW5u
+aXNuZXQxHzAdBgNVBAsTFkVudHJlZSBOZXh0IEdlbmVyYXRpb24xLDAqBgNVBAMTI2FzZWxlY3Qu
+c3RhZ2luZy5lbnRyZWUua2VubmlzbmV0Lm5sMB4XDTExMDIyMzEyMTUxMloXDTE2MDIwNjEyMTUx
+MlowgaYxCzAJBgNVBAYTAk5MMRUwEwYDVQQIEwxadWlkLUhvbGxhbmQxEzARBgNVBAcTClpvZXRl
+cm1lZXIxHDAaBgNVBAoTE1N0aWNodGluZyBLZW5uaXNuZXQxHzAdBgNVBAsTFkVudHJlZSBOZXh0
+IEdlbmVyYXRpb24xLDAqBgNVBAMTI2FzZWxlY3Quc3RhZ2luZy5lbnRyZWUua2VubmlzbmV0Lm5s
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+iQDEWzzn76RgfOsnNrE0xS+WvmXr6oWTwoMa
+NVGZC5UnESbV5vPsNWTEbP8Vh2bT6kTaTnjDMx4POWasHnBPR/h0MCJ78D4nqkIEuhz+QBEvfMgZ
+EgXJgOtoqgenDpXAkoetJkkkmRwt4mBk+puUJUaP3WcI5/J7BM/NdH6JQwIDAQABMA0GCSqGSIb3
+DQEBBAUAA4GBAK5WdDPy4clXgsVWie58A0NkALRwCl7Rbwb0bzddNN0qMpbHGZVINQWzbv6fitd5
+LLAP8wKtEA82unqH7GpQ+8P1BNlmQVbVBA/otFP1n4NKxKBWwyBgNo6CzsCw/yDSxShNH4abwXs0
+OhQcnAYnY6WNzYAbG/OVcIuYbkxfiiCk</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/artifact" index="0"/><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/sso/web"/><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/sso/web"/><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://aselect-s.entree.kennisnet.nl/openaselect/profiles/saml2/sso/web"/></md:IDPSSODescriptor><md:Organization xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"><md:OrganizationName xml:lang="en">skn</md:OrganizationName><md:OrganizationDisplayName xml:lang="en">Stichting Kennisnet (staging)</md:OrganizationDisplayName><md:OrganizationURL xml:lang="en">http://www.kennisnetfederatie.nl</md:OrganizationURL></md:Organization><md:ContactPerson contactType="administrative" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"><md:Company>Stichting Kennisnet</md:Company><md:EmailAddress>entree@kennisnet.nl</md:EmailAddress><md:TelephoneNumber>0800-KENNISNET (0800-536 647 638)</md:TelephoneNumber></md:ContactPerson></md:EntityDescriptor>
