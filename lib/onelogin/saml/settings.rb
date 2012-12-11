@@ -10,6 +10,8 @@ module Onelogin::Saml
     attr_accessor :logger
     attr_accessor :metadata_namespace
     attr_accessor :idp_private_key
+    attr_accessor :ssoquery_url
+    attr_accessor :ssoquery_response_url
     alias :entity_id :issuer
     alias :acs_url :assertion_consumer_service_url
     alias :acs_binding :assertion_consumer_service_binding

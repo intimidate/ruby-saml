@@ -25,7 +25,7 @@ module Onelogin::Saml
 			# Create AuthnRequest root element using REXML 
 			request_doc = REXML::Document.new
 			request_doc.context[:attribute_quote] = :quote
-			root = request_doc.add_element "samlp:AuthnRequest", { "xmlns:samlp" => "urn:oasis:names:tc:SAML:2.0:protocol" }
+			root = request_doc.add_element "samlp:AuthnRequest"
 			root.attributes['ID'] = uuid
 			root.attributes['IssueInstant'] = time
 			root.attributes['Version'] = "2.0"
@@ -34,41 +34,18 @@ module Onelogin::Saml
 			if @settings.assertion_consumer_service_url != nil
 				root.attributes["AssertionConsumerServiceURL"] = @settings.assertion_consumer_service_url
 			end
+      
+      Logging.debug @settings.to_yaml
+      
+      root.attributes['Destination'] = @settings.idp_sso_target_url
+      root.attributes['ProtocolBinding'] = HTTP_POST
+      
 			if @settings.issuer != nil
 				issuer = root.add_element "saml:Issuer", { "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion" }
 				issuer.text = @settings.issuer
 			end
       
-      
-      if @settings.authn_signed
-        digest = Base64.encode64(Digest::SHA1.digest(uuid)).chomp
-                
-				signature = root.add_element "ds:Signature", { "xmlns:ds" => "http://www.w3.org/2000/09/xmldsig#" }
-        signature.add_element "ds:CanonicalizationMethod", { "Algorithm" => "http://www.w3.org/2001/10/xml-exc-c14n#" }
-        signature.add_element "ds:SignatureMethod", { "Algorithm" => "http://www.w3.org/2000/09/xmldsig#rsa-sha1" }
-        reference = signature.add_element "Reference", { "URI" => "#{uuid}" }
-        transforms = reference.add_element "Transforms"
-        transforms.add_element "Transform", {"Algorithm" => "http://www.w3.org/2000/09/xmldsig#enveloped-signature"}
-        transforms.add_element "Transform", {"Algorithm" => "http://www.w3.org/2001/10/xml-exc-c14n#"}
-        
-        reference.add_element "DigestMethod", {"Algorithm" => "http://www.w3.org/2000/09/xmldsig#rsa-sha1"}
-        digest_value = reference.add_element "DigestValue"
-        digest_value.text = digest
-        
-        
-        private_key = @settings.get_private_key
-        sig = private_key.sign(OpenSSL::Digest::SHA1.new, digest)
-        sig = [sig].pack("m").gsub(/\n/, "")
-        
-        
-        signed_info = signature.add_element "ds:SignedInfo"
-        signature_value = signature.add_element "ds:SignatureValue"
-        signature_value.text = sig
-        key_info = signature.add_element "ds:keyInfo"
-        x509_data = key_info.add_element "ds:X509Data"
-        x509_certificate = x509_data.add_element "ds:X509Certificate"
-        x509_certificate.text = @settings.get_cert
-      end
+      root.attributes["xmlns:samlp"] = "urn:oasis:names:tc:SAML:2.0:protocol"    
       
 			if @settings.name_identifier_format != nil
 				root.add_element "samlp:NameIDPolicy", { 
@@ -94,16 +71,16 @@ module Onelogin::Saml
 			end
 
 			@request = ""
-			request_doc.write(@request)
-
+			request_doc.write(@request);
+      
 			Logging.debug "Created AuthnRequest: #{@request}"
-
-			#params.each_pair do |key, value|
-			#  #request_params << "&#{key}=#{CGI.escape(value.to_s)}"
-			#	@request_params[key] = value
-			#end
-
-			#settings.idp_sso_target_url + request_params
+      if @settings.authn_signed
+        private_key = OpenSSL::PKey::RSA.new(File.read(@settings.idp_private_key))      
+        signature_raw  = private_key.sign(OpenSSL::Digest::SHA1.new, @request);      
+        signature = URI::encode(Base64.encode64(signature_raw));
+        params["Signature"] = signature
+        params["SigAlg"] = URI::encode('http://www.w3.org/2000/09/xmldsig#rsa-sha1');
+      end      
 
 			# Based on the IdP metadata, select the appropriate binding 
 			# and return the action to perform to the controller

@@ -8,15 +8,19 @@ module Onelogin::Saml
     PROTOCOL  = "urn:oasis:names:tc:SAML:2.0:protocol"
     DSIG      = "http://www.w3.org/2000/09/xmldsig#"
 
-    attr_accessor :options, :response, :document, :settings
+    attr_accessor :options, :response, :document, :settings, :id
 
     def initialize(response, options = {})
       raise ArgumentError.new("Response cannot be nil") if response.nil?
       self.options  = options
 		
       self.response = response
-      self.document = XMLSecurity::SignedDocument.new(Base64.decode64(response))
-		Logging.debug "Decoded response:\n#{ document }"
+      self.document = REXML::Document.new(response);
+      self.id = REXML::XPath.first(document).attributes['ID']
+      
+      
+      
+		  Logging.debug "Decoded response:\n#{ document }"
     end
 
     def is_valid?
@@ -30,8 +34,8 @@ module Onelogin::Saml
     # The value of the user identifier as designated by the initialization request response
     def name_id
       @name_id ||= begin
-        node = REXML::XPath.first(document, "/p:Response/a:Assertion[@ID='#{document.signed_element_id[1,document.signed_element_id.size]}']/a:Subject/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
-        node ||=  REXML::XPath.first(document, "/p:Response[@ID='#{document.signed_element_id[1,document.signed_element_id.size]}']/a:Assertion/a:Subject/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
+        node = REXML::XPath.first(document, "/p:Response/a:Assertion[@ID='#{self.id}']/a:Subject/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
+        node ||=  REXML::XPath.first(document, "/p:Response[@ID='#{self.id}']/a:Assertion/a:Subject/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
         node.nil? ? nil : node.text
       end
     end
@@ -70,9 +74,15 @@ module Onelogin::Saml
     # Conditions (if any) for the assertion to run
     def conditions
       @conditions ||= begin
-        REXML::XPath.first(document, "/p:Response/a:Assertion[@ID='#{document.signed_element_id[1,document.signed_element_id.size]}']/a:Conditions", { "p" => PROTOCOL, "a" => ASSERTION })
+        REXML::XPath.first(document, "/p:Response/a:Assertion[@ID='#{self.id}']/a:Conditions", { "p" => PROTOCOL, "a" => ASSERTION })
       end
     end
+    
+    def to_s 
+      out = ''
+      self.document.write(out, 2)
+      out 
+    end    
 
     private
 
@@ -82,20 +92,20 @@ module Onelogin::Saml
 
     def validate(soft = true)
 		
-		# prime the IdP metadata before the document validation. 
-		# The idp_cert needs to be populated before the validate_response_state method
-		if settings 
-			Onelogin::Saml::Metadata.new(settings).get_idp_metadata
-		end
+  		# prime the IdP metadata before the document validation. 
+  		# The idp_cert needs to be populated before the validate_response_state method
+  		if settings 
+  			Onelogin::Saml::Metadata.new(settings).get_idp_metadata
+  		end
 		
       return false if validate_response_state(soft) == false
       return false if validate_conditions(soft) == false
 		
-		# Just in case a user needs to toss out the signature validation,
-		# I'm adding in an option for it.  (Sometimes canonicalization is a bitch!)
-		return true if options[:skip_validation]
+		  # Just in case a user needs to toss out the signature validation,
+		  # I'm adding in an option for it.  (Sometimes canonicalization is a bitch!)
+		  return true if options[:skip_validation]
 		
-		# document.validte populates the idp_cert
+		  # document.validte populates the idp_cert
       return false if document.validate(settings, soft) == false
 		
 		return true
@@ -110,7 +120,7 @@ module Onelogin::Saml
         return soft ? false : validation_error("No settings on response")
       end
 		
-		if settings.idp_cert_fingerprint.nil? && settings.idp_cert.nil?
+		  if settings.idp_cert_fingerprint.nil? && settings.idp_cert.nil?
         return soft ? false : validation_error("No fingerprint or certificate on settings")
       end
 		
@@ -150,5 +160,6 @@ module Onelogin::Saml
         Time.parse(node.attributes[attribute])
       end
     end
+  
   end
 end

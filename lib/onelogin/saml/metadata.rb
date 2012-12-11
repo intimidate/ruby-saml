@@ -112,17 +112,6 @@ module Onelogin::Saml
 				name_id.text = @settings.name_identifier_format
 			end
       
-      
-      # if @settings.contact_givenname != nil      
-      #         contact_givenname = contact.add_element "md:GivenName"
-      #         contact_givenname.text = @settings.contact_givenname
-      #       end
-      #       
-      #       if @settings.contact_email != nil    
-      #         contact_email = contact.add_element "md:EmailAddress"
-      #         contact_email.text = @settings.contact_email
-      #       end
-      
 			meta_doc << REXML::XMLDecl.new
 			ret = ""
 			# pretty print the XML so IdP administrators can easily see what the SP supports
@@ -245,11 +234,16 @@ module Onelogin::Saml
 		def build_message( options = {} )
 			opt = { :type => nil, :service => nil, :message => nil, :extra_parameters => nil }.merge(options)
 			action, url = binding_select( opt[:service] )
+      
+      # if(options['Signature'] && options['SigAlg'])
+      #   url = "#{url}&SigAlg=#{options['SigAlg']}&Signature=#{options['Signature']}"
+      # end
+      
 			case action 
-			when "GET"
-				return action, message_get( opt[:type], url, opt[:message], opt[:extra_parameters] )
-			when "POST"
-				return action, message_post( options[:type], url, opt[:message], opt[:extra_parameters] )
+			  when "GET"
+				  return action, message_get( opt[:type], url, opt[:message], opt[:extra_parameters] )
+			  when "POST"
+				  return action, message_post( options[:type], url, opt[:message], opt[:extra_parameters] )
 			end
 		end
 		
@@ -274,7 +268,15 @@ module Onelogin::Saml
 			meta_doc = get_idp_metadata
 			
 			return nil unless meta_doc
-   
+      
+			sso_element = REXML::XPath.first(meta_doc,
+				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}IDPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_GET}']")
+			if sso_element 
+				@URL = sso_element.attributes["Location"]
+				Logging.debug "binding_select: GET from #{@URL}"
+				return "GET", @URL
+			end 
+         
 			sso_element = REXML::XPath.first(meta_doc,
 				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}IDPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_POST}']")
 			if sso_element 
@@ -282,15 +284,7 @@ module Onelogin::Saml
 				Logging.debug "binding_select: POST to #{@URL}"
 				return "POST", @URL
 			end
-      
-			# next try GET
-			sso_element = REXML::XPath.first(meta_doc,
-				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}IDPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_GET}']")
-			if sso_element 
-				@URL = sso_element.attributes["Location"]
-				Logging.debug "binding_select: GET from #{@URL}"
-				return "GET", @URL
-			end      
+           
 			# other types we might want to add in the future:  SOAP, Artifact
 		end
 		# construct the the parameter list on the URL and return
