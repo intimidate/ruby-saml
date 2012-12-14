@@ -215,6 +215,10 @@ module Onelogin::Saml
 					:message => message, :extra_parameters => extra_parameters)			
 		end
 		def create_slo_request(message, extra_parameters = {} )
+      
+      Logging.debug "create_slo_request"
+      Logging.debug " - message #{message}"
+      Logging.debug " - extra_parameters #{extra_parameters}"
 			build_message( :type => "SAMLRequest", 
 					:service => "SingleLogoutService", 
 					:message => message, :extra_parameters => extra_parameters)
@@ -253,6 +257,11 @@ module Onelogin::Saml
 		def binding_select(service)
 			# first check if we're still using the old hard coded method for 
 			# backwards compatability
+      
+      
+      Logging.debug "binding_select"
+      Logging.debug " - service #{service}"
+      Logging.debug " - @settings.idp_slo_target_url #{@settings.idp_slo_target_url}"
       
       metadata_namespace = "#{@settings.metadata_namespace}:" if @settings.metadata_namespace
 
