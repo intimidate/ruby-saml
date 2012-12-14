@@ -275,6 +275,7 @@ module Onelogin::Saml
 			end
 			
 			meta_doc = get_idp_metadata
+      Logging.debug "meta_doc #{meta_doc}"
 			
 			return nil unless meta_doc
       
