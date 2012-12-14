@@ -17,6 +17,7 @@ module Onelogin::Saml
 	  # a few symbols for SAML class names
 		HTTP_POST = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
 		HTTP_GET = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+		HTTP_SOAP = "urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
 		
 		attr_accessor :cache
 
@@ -204,30 +205,26 @@ module Onelogin::Saml
       x509_certificate.text = @settings.get_cert
     end    
 		
-		def create_sso_request(message, extra_parameters = {} )
-			build_message( :type => "SAMLRequest", 
-					:service => "SingleSignOnService", 
-					:message => message, :extra_parameters => extra_parameters)
-		end
-		def create_sso_response(message, extra_parameters = {} )
-			build_message( :type => "SAMLResponse", 
-					:service => "SingleSignOnService", 
-					:message => message, :extra_parameters => extra_parameters)			
-		end
-		def create_slo_request(message, extra_parameters = {} )
-      
-      Logging.debug "create_slo_request"
-      Logging.debug " - message #{message}"
-      Logging.debug " - extra_parameters #{extra_parameters}"
-			build_message( :type => "SAMLRequest", 
-					:service => "SingleLogoutService", 
-					:message => message, :extra_parameters => extra_parameters)
-		end
-		def create_slo_response(message, extra_parameters = {} )
-			build_message( :type => "SAMLResponse", 
-					:service => "SingleLogoutService", 
-					:message => message, :extra_parameters => extra_parameters)			
-		end
+    def create_sso_request(message, extra_parameters = {} )
+    	build_message( :type => "SAMLRequest", 
+    			:service => "SingleSignOnService", 
+    			:message => message, :extra_parameters => extra_parameters)
+    end
+    def create_sso_response(message, extra_parameters = {} )
+    	build_message( :type => "SAMLResponse", 
+    			:service => "SingleSignOnService", 
+    			:message => message, :extra_parameters => extra_parameters)			
+    end
+    def create_slo_request(message, extra_parameters = {} )
+    	build_message( :type => "SAMLRequest", 
+    			:service => "SingleLogoutService", 
+    			:message => message, :extra_parameters => extra_parameters)
+    end
+    def create_slo_response(message, extra_parameters = {} )
+    	build_message( :type => "SAMLResponse", 
+    			:service => "SingleLogoutService", 
+    			:message => message, :extra_parameters => extra_parameters)			
+    end
 
 		# Construct a SAML message using information in the IdP metadata.  
 		# :type can be either "SAMLRequest" or "SAMLResponse" 
@@ -258,11 +255,6 @@ module Onelogin::Saml
 			# first check if we're still using the old hard coded method for 
 			# backwards compatability
       
-      
-      Logging.debug "binding_select"
-      Logging.debug " - service #{service}"
-      Logging.debug " - @settings.idp_slo_target_url #{@settings.idp_slo_target_url}"
-      
       metadata_namespace = "#{@settings.metadata_namespace}:" if @settings.metadata_namespace
 
 			if service == "SingleSignOnService" && 
@@ -275,12 +267,11 @@ module Onelogin::Saml
 			end
 			
 			meta_doc = get_idp_metadata
-      Logging.debug "meta_doc #{meta_doc}"
 			
 			return nil unless meta_doc
       
 			sso_element = REXML::XPath.first(meta_doc,
-				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}IDPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_GET}']")
+				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}SPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_GET}']")
 			if sso_element 
 				@URL = sso_element.attributes["Location"]
 				Logging.debug "binding_select: GET from #{@URL}"
@@ -288,12 +279,21 @@ module Onelogin::Saml
 			end 
          
 			sso_element = REXML::XPath.first(meta_doc,
-				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}IDPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_POST}']")
+				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}SPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_POST}']")
 			if sso_element 
 				@URL = sso_element.attributes["Location"]
 				Logging.debug "binding_select: POST to #{@URL}"
 				return "POST", @URL
 			end
+      
+      #added logout with soap for kennisnet
+			sso_element = REXML::XPath.first(meta_doc,
+				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}SPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_SOAP}']")        
+			if sso_element 
+				@URL = sso_element.attributes["Location"]
+				Logging.debug "binding_select: GET from #{@URL}"
+				return "GET", @URL
+			end 
            
 			# other types we might want to add in the future:  SOAP, Artifact
 		end
