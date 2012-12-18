@@ -271,10 +271,23 @@ module Onelogin::Saml
 			return nil unless meta_doc
       
 			sso_element = REXML::XPath.first(meta_doc,
+				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}IDPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_GET}']")
+			if sso_element 
+				@URL = sso_element.attributes["Location"]
+				return "GET", @URL
+			end 
+         
+			sso_element = REXML::XPath.first(meta_doc,
+				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}IDPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_POST}']")
+			if sso_element 
+				@URL = sso_element.attributes["Location"]
+				return "POST", @URL
+			end
+      
+			sso_element = REXML::XPath.first(meta_doc,
 				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}SPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_GET}']")
 			if sso_element 
 				@URL = sso_element.attributes["Location"]
-				Logging.debug "binding_select: GET from #{@URL}"
 				return "GET", @URL
 			end 
          
@@ -282,7 +295,6 @@ module Onelogin::Saml
 				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}SPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_POST}']")
 			if sso_element 
 				@URL = sso_element.attributes["Location"]
-				Logging.debug "binding_select: POST to #{@URL}"
 				return "POST", @URL
 			end
       
@@ -291,7 +303,6 @@ module Onelogin::Saml
 				"/#{metadata_namespace}EntityDescriptor/#{metadata_namespace}SPSSODescriptor/#{metadata_namespace}#{service}[@Binding='#{HTTP_SOAP}']")        
 			if sso_element 
 				@URL = sso_element.attributes["Location"]
-				Logging.debug "binding_select: GET from #{@URL}"
 				return "GET", @URL
 			end 
            
@@ -306,7 +317,6 @@ module Onelogin::Saml
 			# compress GET requests to try and stay under that 8KB request limit
 			params[type] = encode( deflate( message ) )
 			
-			Logging.debug "#{type}=#{params[type]}"
 			
 			uri = Addressable::URI.parse(url)
 			if uri.query_values == nil
@@ -317,7 +327,6 @@ module Onelogin::Saml
 			end
 			url = uri.to_s
 			#url = @URL + "?SAMLRequest=" + @request_params["SAMLRequest"]
-			Logging.debug "Sending to URL #{url}"
 			return url
 		end
 		# construct an HTML form (POST) and return the content
@@ -344,7 +353,6 @@ module Onelogin::Saml
 			end
 			str += "</form></body></html>\n"
 			
-			Logging.debug "Created form:\n#{str}"
 			return str
 		end
 		
