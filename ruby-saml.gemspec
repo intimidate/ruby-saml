@@ -5,10 +5,10 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ruby-saml}
-  s.version = "0.5"
+  s.version = "0.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["OneLogin LLC"]
+  s.authors = ["OneLogin LLC", "Tim van den Eijnden"]
   s.date = %q{2011-06-30}
   s.description = %q{SAML toolkit for Ruby on Rails}
   s.email = %q{support@onelogin.com}
