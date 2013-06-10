@@ -7,9 +7,9 @@ module Onelogin::Saml
     DSIG      = "http://www.w3.org/2000/09/xmldsig#"
 	  
     include Coding
-	 include Request
+	  include Request
     attr_reader :transaction_id
-	attr_accessor :settings
+	  attr_accessor :settings
 	
     def initialize( options = {} )
 		opt = {  :request => nil, :settings => nil  }.merge(options)
