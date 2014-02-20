@@ -9,10 +9,11 @@ begin
     gem.description = %Q{SAML toolkit for Ruby on Rails}
     gem.email = "support@onelogin.com"
     gem.homepage = "http://github.com/onelogin/ruby-saml"
-    gem.authors = ["OneLogin LLC"]
+    gem.authors = ["OneLogin LLC","Tim van den Eijnden"]
     gem.add_dependency("canonix","~> 0.1")
     gem.add_dependency("uuid","~> 2.3.7")
     gem.add_dependency("systemu", "~> 2.5.0")
+    gem.add_dependency("addressable", "~> 2.3.5")
     gem.add_development_dependency "shoulda"
     gem.add_development_dependency "mocha"
     #gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
