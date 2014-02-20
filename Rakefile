@@ -12,6 +12,7 @@ begin
     gem.authors = ["OneLogin LLC"]
     gem.add_dependency("canonix","~> 0.1")
     gem.add_dependency("uuid","~> 2.3.7")
+    gem.add_dependency("systemu", "~> 2.5.0")
     gem.add_development_dependency "shoulda"
     gem.add_development_dependency "mocha"
     #gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
